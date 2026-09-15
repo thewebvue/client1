@@ -12,6 +12,13 @@
     <!-- FILM GRAIN TEXTURE -->
     <div id="grainOverlay"></div>
 
+    <!-- BACKGROUND MUSIC (plays site-wide from page load) -->
+    <audio id="bgMusic" src="hbd.mp3" loop preload="auto"></audio>
+    <button id="musicToggleBtn" class="global-music-btn" aria-label="Play background music">
+        <span class="music-icon">🎵</span>
+        <span class="sound-wave"><i></i><i></i><i></i><i></i></span>
+    </button>
+
     <!-- OPENING SEQUENCE -->
     <div id="openingIntro">
         <p class="intro-eyebrow">Every story starts somewhere.</p>
@@ -35,12 +42,11 @@
         </button>
         <div class="nav-links" id="navLinks">
             <a href="#home">Home</a>
-            <a href="#gallery">Gallery</a>
             <a href="#world">His World</a>
             <a href="#people">His People</a>
             <a href="#game">Screen Test</a>
             <a href="#puzzle">Puzzle</a>
-            <a href="#future" class="btn-special">A Special Day ♡</a>
+            <a href="#celebration" class="btn-special">A Special Day ♡</a>
         </div>
     </nav>
 
@@ -108,7 +114,7 @@
 
                 <div class="polaroid" onclick="openModal('ilayaraja_video.mp4', 'Fav Music — Ilaiyaraaja ♡', 'video')" tabindex="0">
                     <div class="polaroid-cover">
-                        <img src="Ilayaraja.jpg" alt="Fav Music" class="polaroid-box-img">
+                        <img src="ilayaraja.jpg" alt="Fav Music" class="polaroid-box-img">
                         <span class="reveal-hint">▶ Click to play</span>
                     </div>
                     <p>Fav Music ♡</p>
@@ -133,68 +139,9 @@
         </div>
     </section>
 
-    <!-- ACT TWO — GALLERY -->
-    <section id="gallery" class="section-container">
-        <span class="chapter-tag">Reel Two — A Few Frames</span>
-        <h2 class="section-title">Moments, Not Just Memories.</h2>
-        <p class="section-subtitle">Swipe through. Every frame here earned its place in the reel.</p>
-
-        <div class="reel-carousel" id="reelCarousel">
-            <div class="carousel-viewport" id="carouselViewport">
-                <!-- Replace each src below with your own photo filenames. Add or remove <div class="carousel-slide"> blocks freely. -->
-                <div class="carousel-track" id="carouselTrack">
-                    <div class="carousel-slide">
-                        <img src="photo_7.jpeg" alt="Gallery photo 1">
-                        <p class="slide-caption">WWhere It All Began 🕰️</p>
-                    </div>
-                    <div class="carousel-slide">
-                        <img src="photo_2.jpeg" alt="Gallery photo 2">
-                        <p class="slide-caption">SBack to My Roots 🌿</p>
-                    </div>
-                    <div class="carousel-slide">
-                        <img src="photo_3.jpeg" alt="Gallery photo 3">
-                        <p class="slide-caption">Quiet Thoughts at Night 💭</p>
-                    </div>
-                    <div class="carousel-slide">
-                        <img src="photo_4.jpeg" alt="Gallery photo 4">
-                        <p class="slide-caption">Just Being Me 😌</p>
-                    </div>
-                    <div class="carousel-slide">
-                        <img src="photo_5.jpeg" alt="Gallery photo 5">
-                        <p class="slide-caption">Another Day at Work 💼</p>
-                    </div>
-                    <div class="carousel-slide">
-                        <img src="photo_6.jpeg" alt="Gallery photo 6">
-                        <p class="slide-caption">A story still unfolding</p>
-                    </div>
-                                        <div class="carousel-slide">
-                        <img src="photo_1.jpeg" alt="Gallery photo 7">
-                        <p class="slide-caption">Living the Good Times 😎</p>
-                    </div>
-                                        <div class="carousel-slide">
-                        <img src="photo_8.jpeg" alt="Gallery photo 6">
-                        <p class="slide-caption">AReady for the Day ✨</p>
-                    </div>
-                                        <div class="carousel-slide">
-                        <img src="photo_9.jpeg" alt="Gallery photo 6">
-                        <p class="slide-caption">Out on the Open Road 🛣️</p>
-                    </div>
-                                        <div class="carousel-slide">
-                        <img src="photo_10.jpeg" alt="Gallery photo 6">
-                        <p class="slide-caption">Late Night in the City 🌃</p>
-                    </div>
-                                    
-                </div>
-            </div>
-        </div>
-
-        <p class="swipe-hint" id="swipeHint">✋ Swipe to browse</p>
-        <div class="carousel-dots" id="carouselDots"></div>
-    </section>
-
-    <!-- ACT THREE — HIS WORLD -->
+    <!-- ACT TWO — HIS WORLD -->
     <section id="world" class="section-container">
-        <span class="chapter-tag">Reel Three</span>
+        <span class="chapter-tag">Reel Two</span>
         <h2 class="section-title">Things That Make Him… Him.</h2>
         <p class="section-subtitle">Some people just live differently. Here's the cast of things that shaped him.</p>
 
@@ -218,7 +165,7 @@
 
     <!-- ACT THREE — HIS PEOPLE -->
     <section id="people" class="section-container">
-        <span class="chapter-tag">Reel Four</span>
+        <span class="chapter-tag">Reel Three</span>
         <h2 class="section-title">His People</h2>
         <p class="section-subtitle">Behind every person is a few people who quietly become their whole world.</p>
 
@@ -226,6 +173,8 @@
             <div class="people-card">
                 <h2>Amma ❤️</h2>
                 <p class="caption-line">"The anchor to all his dreams."</p>
+                <!-- Added button to open Amma's picture -->
+                <button class="play-btn" onclick="openModal('amma_pic.jpeg', 'Amma ❤️')">▶ Click to view picture</button>
             </div>
 
             <div class="people-card">
@@ -236,12 +185,19 @@
                 <audio id="specialAudio" src="audio.mp3"></audio>
                 <button class="play-btn" onclick="playAudio()">▶ Play Her Voice / Ringtone</button>
             </div>
+            
+            <!-- Added Third Card for his favorite song -->
+            <div class="people-card">
+                <h2>His fav song 🎵</h2>
+                <p class="caption-line">The track on repeat.</p>
+                <button class="play-btn" onclick="openModal('add_song.mp4', 'His Fav Song', 'video')">▶ Listen to song</button>
+            </div>
         </div>
     </section>
 
     <!-- ACT FOUR — THE SCREEN TEST -->
     <section id="game" class="section-container">
-        <span class="chapter-tag">Reel Five</span>
+        <span class="chapter-tag">Reel Four</span>
         <h2 class="section-title">The Screen Test</h2>
         <p class="section-subtitle">Everyone claims to know the lead actor. Let's see how the score card actually reads.</p>
 
@@ -257,7 +213,7 @@
 
     <!-- ACT FIVE — THE PUZZLE -->
     <section id="puzzle" class="section-container">
-        <span class="chapter-tag">Reel Six — Piece Him Together</span>
+        <span class="chapter-tag">Reel Five — Piece Him Together</span>
         <h2 class="section-title">Solve The Scene.</h2>
         <p class="section-subtitle">Every good story is a few scattered frames until someone puts them back in order. Slide the tiles until his picture comes together.</p>
 
@@ -273,7 +229,7 @@
 
     <!-- ACT SIX — HIS FUTURE -->
     <section id="future" class="section-container">
-        <span class="chapter-tag">Reel Seven — The Final Cut</span>
+        <span class="chapter-tag">Reel Six — Looking Ahead</span>
         <h2 class="section-title">To The Man He Is Becoming.</h2>
         <p class="section-subtitle">The credits haven't rolled yet. This part of the story is still being filmed.</p>
 
@@ -295,11 +251,262 @@
                 <h4>🎬 Director Manikandan</h4>
             </div>
         </div>
+    </section>
 
-        <div class="final-wish">
-            <p class="typewriter-text" id="typewriterText"></p>
-            <h1 class="big-wish" id="bigWish">Happy Birthday, Manikandan ❤️</h1>
-        </div>
+    <!-- ACT SEVEN — THE GRAND FINALE -->
+    <section id="celebration" class="section-container cx-root">
+        <span class="chapter-tag">Reel Seven — The Grand Finale</span>
+        <h2 class="section-title">One Last Surprise.</h2>
+        <p class="section-subtitle">Every film earns its closing scene. Tap through to his.</p>
+
+        <canvas id="ambientCanvas"></canvas>
+        <canvas id="fxCanvas"></canvas>
+
+        <main id="experienceStage" class="stage-container">
+
+            <!-- STAGE 1: GIFT BOX -->
+            <div id="giftStage" class="cx-stage active-stage" aria-label="Gift Box Stage">
+                <div class="stage-content text-center">
+                    <div class="header-badge animate-fade-down">A Special Surprise ✨</div>
+                    <h1 class="main-title text-glow animate-fade-down delay-1" id="giftGreetingTitle">
+                        Someone has a little surprise for you... ✨
+                    </h1>
+                    <p class="sub-text animate-fade-down delay-2">Created with love, just for your special day</p>
+
+                    <div class="gift-box-wrapper" id="giftBoxWrapper" role="button" tabindex="0" aria-label="Tap to open the birthday gift box">
+                        <div class="gift-glow-halo"></div>
+                        <div class="gift-box-3d" id="giftBox">
+                            <div class="box-lid" id="boxLid">
+                                <div class="lid-face lid-top">
+                                    <div class="ribbon-cross-h"></div>
+                                    <div class="ribbon-cross-v"></div>
+                                    <div class="bow-knot">
+                                        <div class="bow-loop bow-loop-left"></div>
+                                        <div class="bow-loop bow-loop-right"></div>
+                                        <div class="bow-loop bow-loop-top"></div>
+                                        <div class="bow-loop bow-loop-bottom"></div>
+                                        <div class="bow-center"></div>
+                                        <div class="bow-ribbon-tail tail-left"></div>
+                                        <div class="bow-ribbon-tail tail-right"></div>
+                                    </div>
+                                </div>
+                                <div class="lid-face lid-front"></div>
+                                <div class="lid-face lid-back"></div>
+                                <div class="lid-face lid-left"></div>
+                                <div class="lid-face lid-right"></div>
+                            </div>
+                            <div class="box-body" id="boxBody">
+                                <div class="box-face box-front"><div class="ribbon-v"></div></div>
+                                <div class="box-face box-back"><div class="ribbon-v"></div></div>
+                                <div class="box-face box-left"><div class="ribbon-v"></div></div>
+                                <div class="box-face box-right"><div class="ribbon-v"></div></div>
+                                <div class="box-face box-top-inside"><div class="inner-treasure-glow"></div></div>
+                                <div class="box-face box-bottom"></div>
+                            </div>
+                            <div class="box-shadow"></div>
+                        </div>
+                    </div>
+
+                    <div class="tap-hint animate-bounce-slow" id="giftTapHint">
+                        <span class="finger-icon">👉</span>
+                        <span class="hint-text">Tap the gift 🎁</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAGE 2: CAKE & CANDLES -->
+            <div id="cakeStage" class="cx-stage hidden-stage" aria-label="Birthday Cake Stage">
+                <div class="stage-content text-center">
+                    <div class="cake-titles">
+                        <div class="header-badge" id="cakeBadge">Surprise Revealed 🎂</div>
+                        <h1 class="main-title text-glow recipient-title" id="cakeRecipientTitle">Happy Birthday, <span class="name-highlight" id="recipientNameDisplay">Manikandan</span> ❤️</h1>
+                        <p class="cake-instruction" id="cakeInstruction">Make a wish... ✨</p>
+                    </div>
+
+                    <div class="cake-3d-wrapper" id="cakeWrapper">
+                        <div class="cake-glow-aura"></div>
+                        <div class="cake-assembly" id="cakeAssembly">
+                            <div class="cake-plate"><div class="plate-inner"></div></div>
+
+                            <div class="cake-body-container" id="cakeBodyContainer">
+                                <div class="cake-structure" id="cakeStructure">
+                                    <div class="cake-tier tier-bottom">
+                                        <div class="tier-frosting-top"><div class="frosting-piping"></div></div>
+                                        <div class="tier-side"><div class="tier-drips"></div><div class="tier-stripes"></div></div>
+                                    </div>
+                                    <div class="cake-tier tier-top">
+                                        <div class="tier-frosting-top">
+                                            <div class="toppings-row">
+                                                <span class="topping strawberry s1">🍓</span>
+                                                <span class="topping pearl p1">✨</span>
+                                                <span class="topping strawberry s2">🍓</span>
+                                                <span class="topping pearl p2">✨</span>
+                                                <span class="topping strawberry s3">🍓</span>
+                                                <span class="topping pearl p3">✨</span>
+                                                <span class="topping strawberry s4">🍓</span>
+                                            </div>
+                                        </div>
+                                        <div class="tier-side"><div class="tier-drips"></div><div class="tier-stripes"></div></div>
+                                    </div>
+                                    <div class="cake-slice-piece" id="cakeSlicePiece">
+                                        <div class="slice-inner-sponge"></div>
+                                        <div class="slice-frosting"></div>
+                                        <div class="slice-strawberry">🍓</div>
+                                    </div>
+                                </div>
+
+                                <div class="candles-container" id="candlesContainer">
+                                    <div class="candle-item candle-left" data-candle="1">
+                                        <div class="candle-flame" id="flame1"><div class="flame-core"></div><div class="flame-halo"></div><div class="flame-smoke"></div></div>
+                                        <div class="candle-wick"></div>
+                                        <div class="candle-stick candle-stripe-gold"></div>
+                                    </div>
+                                    <div class="candle-item candle-center" data-candle="2">
+                                        <div class="candle-flame" id="flame2"><div class="flame-core"></div><div class="flame-halo"></div><div class="flame-smoke"></div></div>
+                                        <div class="candle-wick"></div>
+                                        <div class="candle-stick candle-stripe-pink"></div>
+                                    </div>
+                                    <div class="candle-item candle-right" data-candle="3">
+                                        <div class="candle-flame" id="flame3"><div class="flame-core"></div><div class="flame-halo"></div><div class="flame-smoke"></div></div>
+                                        <div class="candle-wick"></div>
+                                        <div class="candle-stick candle-stripe-gold"></div>
+                                    </div>
+                                </div>
+
+                                <div class="cake-knife" id="cakeKnife">
+                                    <div class="knife-blade"></div>
+                                    <div class="knife-handle"></div>
+                                    <div class="knife-gleam"></div>
+                                </div>
+                            </div>
+                            <div class="cake-shadow"></div>
+                        </div>
+                    </div>
+
+                    <div class="cake-actions" id="cakeActions">
+                        <button id="lightCandlesBtn" class="action-btn primary-btn pulse-glow">
+                            <span class="btn-icon">🕯️</span><span>Light the Candles ✨</span>
+                        </button>
+
+                        <div id="blowControls" class="blow-controls-group hidden">
+                            <div class="mic-status-badge" id="micStatusBadge">
+                                <span class="mic-icon-pulse">🎙️</span>
+                                <span id="micStatusText">Blow into your microphone or tap below!</span>
+                            </div>
+                            <button id="blowCandlesBtn" class="action-btn blow-btn pulse-glow">
+                                <span class="btn-icon">💨</span><span>Tap to Blow 💨</span>
+                            </button>
+                        </div>
+
+                        <button id="cutCakeBtn" class="action-btn cut-btn hidden pulse-glow">
+                            <span class="btn-icon">🔪</span><span>Cut the Cake 🎂</span>
+                        </button>
+
+                        <button id="goToMemoriesBtn" class="action-btn primary-btn hidden animate-pop">
+                            <span>Look at Our Memories ❤️</span><span class="btn-icon">📸</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAGE 3: PHOTO MEMORIES -->
+            <div id="memoryStage" class="cx-stage hidden-stage" aria-label="Memories Section">
+                <div class="stage-content">
+                    <div class="section-header text-center">
+                        <div class="header-badge animate-fade-down">Treasured Moments 💖</div>
+                        <h2 class="main-title text-glow animate-fade-down delay-1">Beautiful Memories ❤️</h2>
+                        <p class="sub-text animate-fade-down delay-2">Every smile, every frame, every reel of him — precious.</p>
+                    </div>
+
+                    <div class="polaroid-gallery" id="polaroidGallery"></div>
+
+                    <div class="text-center gallery-bottom-action">
+                        <button id="goToLetterBtn" class="action-btn primary-btn pulse-glow">
+                            <span>One Last Surprise 💌</span><span class="btn-icon">✨</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAGE 4: LETTER -->
+            <div id="letterStage" class="cx-stage hidden-stage" aria-label="Birthday Letter Stage">
+                <div class="stage-content text-center">
+                    <div class="section-header">
+                        <div class="header-badge">A Heartfelt Message 💌</div>
+                        <h2 class="main-title text-glow">One Last Surprise...</h2>
+                        <p class="sub-text">A special letter straight from the heart</p>
+                    </div>
+
+                    <div class="envelope-wrapper" id="envelopeWrapper">
+                        <div class="envelope-3d" id="envelope3D" role="button" tabindex="0" aria-label="Tap to open the birthday letter">
+                            <div class="envelope-back"></div>
+                            <div class="letter-sheet" id="letterSheet">
+                                <div class="letter-paper">
+                                    <div class="letter-border">
+                                        <div class="letter-stamp">🎬</div>
+                                        <h3 class="letter-salutation" id="letterSalutation">Happy Birthday, <span id="letterNameDisplay">Manikandan</span> ❤️</h3>
+                                        <div class="letter-body-text" id="letterBodyContent"></div>
+                                        <div class="letter-signature">
+                                            <span>From all of us,</span>
+                                            <span class="signature-font">With all our love ❤️</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="envelope-front-left"></div>
+                            <div class="envelope-front-right"></div>
+                            <div class="envelope-front-bottom"></div>
+                            <div class="envelope-flap" id="envelopeFlap">
+                                <div class="wax-seal"><span>💌</span></div>
+                            </div>
+                        </div>
+                        <div class="envelope-hint" id="envelopeHint">
+                            <span>Tap the envelope to open 💌</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAGE 5: FINALE -->
+            <div id="finalStage" class="cx-stage hidden-stage" aria-label="Grand Finale Stage">
+                <div class="stage-content text-center finale-wrapper">
+                    <div class="finale-card glass-panel">
+                        <div class="finale-crown">👑</div>
+                        <div class="header-badge">Forever Cherished ✨</div>
+
+                        <h1 class="finale-title text-glow" id="finaleTitle">
+                            Happy Birthday, <span class="name-highlight" id="finaleNameDisplay">Manikandan</span>! 🎂❤️
+                        </h1>
+
+                        <p class="finale-subtitle" id="finaleSubtitle">
+                            "This reel was always going to end here — with everyone who loves you, cheering." ✨
+                        </p>
+
+                        <div class="finale-quote-box">
+                            <p class="finale-quote">
+                                Keep chasing the things that make you feel alive. Keep the people you love close. Keep listening to your music. Keep dreaming about that first film — and someday, we'll all be waiting for "A Film by CA Manikandan." 🎬
+                            </p>
+                        </div>
+
+                        <div class="finale-decorations">
+                            <span class="floating-item f1">💖</span>
+                            <span class="floating-item f2">🌟</span>
+                            <span class="floating-item f3">🎂</span>
+                            <span class="floating-item f4">✨</span>
+                            <span class="floating-item f5">🎈</span>
+                            <span class="floating-item f6">🎁</span>
+                        </div>
+
+                        <div class="finale-actions">
+                            <button id="replayExperienceBtn" class="action-btn secondary-btn">
+                                <span class="btn-icon">🔄</span><span>Replay Experience</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </section>
 
     <div id="imageModal" class="modal">
