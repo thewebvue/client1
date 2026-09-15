@@ -495,7 +495,7 @@ const memoryImages = [
     { url: "photo_8.jpeg", caption: "Ready for the Day ✨" },
     { url: "photo_9.jpeg", caption: "Out on the Open Road 🛣️" },
     { url: "photo_10.jpeg", caption: "Late Night in the City 🌃" },
-    { url: "main_img.jpeg", caption: "Every Chapter, Him ❤️" }
+    { url: "Main_img.jpeg", caption: "Every Chapter, Him ❤️" }
 ];
 
 const cxState = {
