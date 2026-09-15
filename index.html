@@ -72,13 +72,11 @@
                     <li>A Son. A Brother. A Friend.</li>
                     <li>A Story still being written...</li>
                 </ul>
-                <!-- <p class="script-text">"From Andheri... with a Tamil Heart"</p> -->
             </div>
 
             <div class="hero-image">
                 <div class="film-still">
                     <span class="take-tag">TAKE 01</span>
-                    <!-- Change "surya_img.jpeg" to your downloaded hero image name if needed -->
                     <img src="Main_img.jpeg" alt="Manikandan">
                     <span class="still-caption">Manikandan ♡</span>
                 </div>
@@ -112,7 +110,8 @@
                     <p>Fav Temple ♡</p>
                 </div>
 
-                <div class="polaroid" onclick="openModal('ilayaraja_video.mp4', 'Fav Music — Ilaiyaraaja ♡', 'video')" tabindex="0">
+                <!-- UPDATED WITH NEXT VIDEO PARAMETER -->
+                <div class="polaroid" onclick="openModal('ilayaraja_video.mp4', 'Fav Music — Ilaiyaraaja ♡', 'video', 'song_2.mp4')" tabindex="0">
                     <div class="polaroid-cover">
                         <img src="Ilayaraja.jpg" alt="Fav Music" class="polaroid-box-img">
                         <span class="reveal-hint">▶ Click to play</span>
@@ -120,7 +119,8 @@
                     <p>Fav Music ♡</p>
                 </div>
 
-                <div class="polaroid" onclick="openModal('sethubathi_video.mp4', 'Fav Hero — Vijay Sethupathi ♡', 'video')" tabindex="0">
+                <!-- UPDATED WITH NEXT VIDEO PARAMETER -->
+                <div class="polaroid" onclick="openModal('sethubathi_video.mp4', 'Fav Hero — Vijay Sethupathi ♡', 'video', 'hero_2.mp4')" tabindex="0">
                     <div class="polaroid-cover">
                         <img src="Vijay Sethupathi.jpg" alt="Fav Hero" class="polaroid-box-img">
                         <span class="reveal-hint">▶ Click to play</span>
@@ -128,7 +128,8 @@
                     <p>Fav Hero ♡</p>
                 </div>
 
-                <div class="polaroid" onclick="openModal('nayan_video.mp4', 'Fav Heroine — Nayanthara ♡', 'video')" tabindex="0">
+                <!-- UPDATED WITH NEXT VIDEO PARAMETER -->
+                <div class="polaroid" onclick="openModal('nayan_video.mp4', 'Fav Heroine — Nayanthara ♡', 'video', 'heroine_2.mp4')" tabindex="0">
                     <div class="polaroid-cover">
                         <img src="nayanthara_img.jpg" alt="Fav Heroine" class="polaroid-box-img">
                         <span class="reveal-hint">▶ Click to play</span>
@@ -173,7 +174,6 @@
             <div class="people-card">
                 <h2>Amma ❤️</h2>
                 <p class="caption-line">"The anchor to all his dreams."</p>
-                <!-- Added button to open Amma's picture -->
                 <button class="play-btn" onclick="openModal('amma_pic.jpeg', 'Amma ❤️')">▶ Click to view picture</button>
             </div>
 
@@ -181,17 +181,15 @@
                 <h2>Sashtika 👧</h2>
                 <p class="caption-line">Some bonds don't need an explanation.</p>
                 <p>One of the little pieces of his heart.</p>
-                <!-- Put audio.mp3 and puzzle_img.jpg in the SAME folder as this HTML file -->
                 <audio id="specialAudio" src="audio.mp3"></audio>
                 <button class="play-btn" onclick="playAudio()">▶ Play Her Voice / Ringtone</button>
             </div>
             
-            <!-- Added Third Card for his favorite song -->
-            <div class="people-card">
+            <!-- <div class="people-card">
                 <h2>His fav song 🎵</h2>
                 <p class="caption-line">The track on repeat.</p>
                 <button class="play-btn" onclick="openModal('add_song.mp4', 'His Fav Song', 'video')">▶ Listen to song</button>
-            </div>
+            </div> -->
         </div>
     </section>
 
@@ -263,7 +261,6 @@
         <canvas id="fxCanvas"></canvas>
 
         <main id="experienceStage" class="stage-container">
-
             <!-- STAGE 1: GIFT BOX -->
             <div id="giftStage" class="cx-stage active-stage" aria-label="Gift Box Stage">
                 <div class="stage-content text-center">
@@ -509,11 +506,13 @@
         </main>
     </section>
 
+    <!-- UPDATED: Added Next Button inside the Modal -->
     <div id="imageModal" class="modal">
         <span class="close-modal" onclick="closeModal()">&times;</span>
         <img class="modal-content" id="modalImg">
         <video class="modal-content" id="modalVideo" controls playsinline></video>
         <div id="modalCaption"></div>
+        <button id="modalNextBtn" class="modal-next-btn" onclick="playNextVideo()">Next ➔</button>
     </div>
 
     <footer class="credit-footer">
