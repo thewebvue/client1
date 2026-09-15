@@ -8,10 +8,55 @@ document.addEventListener('DOMContentLoaded', () => {
     initQuiz();
     initPuzzle();
     initTimelineReveal();
-    initTypewriter();
     initNavToggle();
-    initGalleryCarousel();
+    initBgMusic();
 });
+
+/* ---------- SITE-WIDE BACKGROUND MUSIC ---------- */
+function initBgMusic() {
+    const bgMusic = document.getElementById('bgMusic');
+    const toggle = document.getElementById('musicToggleBtn');
+    if (!bgMusic || !toggle) return;
+
+    let playing = false;
+
+    function setUI(isPlaying) {
+        playing = isPlaying;
+        toggle.classList.toggle('active', isPlaying);
+        const stateEl = toggle.querySelector('.music-state');
+        if (stateEl) stateEl.textContent = isPlaying ? 'ON' : 'OFF';
+        toggle.setAttribute('aria-label', isPlaying ? 'Pause background music' : 'Play background music');
+    }
+
+    function tryPlay() {
+        bgMusic.play().then(() => setUI(true)).catch(() => setUI(false));
+    }
+
+    // Try to autoplay as soon as the page loads.
+    tryPlay();
+
+    // Most browsers block audio-with-sound autoplay until the visitor
+    // interacts with the page — so start it on the very first tap/click/key
+    // anywhere, if it hasn't already started.
+    const startOnFirstInteraction = () => {
+        if (!playing) tryPlay();
+        document.removeEventListener('click', startOnFirstInteraction);
+        document.removeEventListener('touchstart', startOnFirstInteraction);
+        document.removeEventListener('keydown', startOnFirstInteraction);
+    };
+    document.addEventListener('click', startOnFirstInteraction, { once: true });
+    document.addEventListener('touchstart', startOnFirstInteraction, { once: true });
+    document.addEventListener('keydown', startOnFirstInteraction, { once: true });
+
+    toggle.addEventListener('click', () => {
+        if (playing) {
+            bgMusic.pause();
+            setUI(false);
+        } else {
+            tryPlay();
+        }
+    });
+}
 
 /* ---------- MOBILE NAV TOGGLE ---------- */
 function initNavToggle() {
@@ -34,159 +79,6 @@ function initNavToggle() {
     });
 
     links.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-}
-
-/* ---------- GALLERY: swipeable coverflow carousel ---------- */
-function initGalleryCarousel() {
-    const viewport = document.getElementById('carouselViewport');
-    const track = document.getElementById('carouselTrack');
-    const dotsWrap = document.getElementById('carouselDots');
-    const swipeHint = document.getElementById('swipeHint');
-    if (!viewport || !track) return;
-
-    const originalSlides = Array.from(track.children);
-    const total = originalSlides.length;
-    if (total === 0) return;
-
-    // Clone the last slide to the front, and the first slide to the back,
-    // so wrapping past either end is a seamless continuation (like the
-    // Fav filmstrip) instead of a visible jump back to the start.
-    const canLoop = total > 1;
-    if (canLoop) {
-        const firstClone = originalSlides[0].cloneNode(true);
-        const lastClone = originalSlides[total - 1].cloneNode(true);
-        firstClone.setAttribute('aria-hidden', 'true');
-        lastClone.setAttribute('aria-hidden', 'true');
-        track.insertBefore(lastClone, originalSlides[0]);
-        track.appendChild(firstClone);
-    }
-
-    const allSlides = Array.from(track.children);
-    let trackIndex = canLoop ? 1 : 0; // position within allSlides that is on screen
-    let autoplayTimer = null;
-    let hintDismissed = false;
-
-    // Build dots — one per REAL photo, not per clone
-    const dots = [];
-    originalSlides.forEach((_, i) => {
-        const dot = document.createElement('button');
-        dot.classList.add('dot');
-        dot.setAttribute('aria-label', `Go to photo ${i + 1}`);
-        dot.addEventListener('click', () => {
-            trackIndex = canLoop ? i + 1 : i;
-            update();
-            restartAutoplay();
-            dismissHint();
-        });
-        dotsWrap.appendChild(dot);
-        dots.push(dot);
-    });
-
-    function dismissHint() {
-        if (hintDismissed || !swipeHint) return;
-        hintDismissed = true;
-        swipeHint.classList.add('dismissed');
-    }
-
-    function realIndex() {
-        if (!canLoop) return trackIndex;
-        return ((trackIndex - 1) + total) % total;
-    }
-
-    function slideWidth() {
-        return viewport.clientWidth;
-    }
-
-    function update(withTransition = true) {
-        if (!withTransition) track.style.transition = 'none';
-        track.style.transform = `translateX(${-trackIndex * slideWidth()}px)`;
-        if (!withTransition) {
-            void track.offsetHeight; // force reflow before re-enabling transition
-            track.style.transition = '';
-        }
-        allSlides.forEach((slide, i) => slide.classList.toggle('active', i === trackIndex));
-        const ri = realIndex();
-        dots.forEach((dot, i) => dot.classList.toggle('active', i === ri));
-    }
-
-    function next() { trackIndex++; update(); }
-    function prev() { trackIndex--; update(); }
-
-    // When a transition into a cloned slide finishes, silently snap to the
-    // matching real slide with no animation — the clone looks identical,
-    // so the loop feels continuous instead of ending.
-    track.addEventListener('transitionend', (e) => {
-        if (e.propertyName !== 'transform' || !canLoop) return;
-        if (trackIndex === allSlides.length - 1) {
-            trackIndex = 1;
-            update(false);
-        } else if (trackIndex === 0) {
-            trackIndex = total;
-            update(false);
-        }
-    });
-
-    // Keyboard navigation when the carousel is focused
-    viewport.setAttribute('tabindex', '0');
-    viewport.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') { next(); restartAutoplay(); dismissHint(); }
-        if (e.key === 'ArrowLeft') { prev(); restartAutoplay(); dismissHint(); }
-    });
-
-    // Swipe / drag support (touch + mouse via Pointer Events).
-    // A drag ever only advances exactly one photo, however far you pull.
-    let isDragging = false;
-    let startX = 0;
-    let currentTranslate = 0;
-
-    viewport.addEventListener('pointerdown', (e) => {
-        isDragging = true;
-        startX = e.clientX;
-        currentTranslate = 0;
-        track.style.transition = 'none';
-        viewport.setPointerCapture(e.pointerId);
-        stopAutoplay();
-        dismissHint();
-    });
-
-    viewport.addEventListener('pointermove', (e) => {
-        if (!isDragging) return;
-        currentTranslate = e.clientX - startX;
-        const base = -trackIndex * slideWidth();
-        track.style.transform = `translateX(${base + currentTranslate}px)`;
-    });
-
-    function endDrag() {
-        if (!isDragging) return;
-        isDragging = false;
-        track.style.transition = '';
-        const threshold = 50;
-        if (currentTranslate < -threshold) next();
-        else if (currentTranslate > threshold) prev();
-        else update();
-        currentTranslate = 0;
-        restartAutoplay();
-    }
-    viewport.addEventListener('pointerup', endDrag);
-    viewport.addEventListener('pointercancel', endDrag);
-    viewport.addEventListener('pointerleave', () => { if (isDragging) endDrag(); });
-
-    // Gentle autoplay that yields to the user on any interaction
-    function startAutoplay() {
-        if (!canLoop) return;
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        autoplayTimer = setInterval(next, 4500);
-    }
-    function stopAutoplay() { clearInterval(autoplayTimer); }
-    function restartAutoplay() { stopAutoplay(); startAutoplay(); }
-
-    viewport.addEventListener('mouseenter', stopAutoplay);
-    viewport.addEventListener('mouseleave', restartAutoplay);
-
-    window.addEventListener('resize', () => update(false));
-
-    update(false);
-    startAutoplay();
 }
 
 /* ---------- OPENING SEQUENCE ---------- */
@@ -535,96 +427,574 @@ function initTimelineReveal() {
     onScroll();
 }
 
-/* ---------- FINALE: typewriter dedication ---------- */
-function initTypewriter() {
-    const el = document.getElementById('typewriterText');
-    const wish = document.getElementById('bigWish');
-    if (!el) return;
 
-    const lines = [
-        "En CA… En Director… En Forever ❤️",
-        "Accounts-la numbers-a thedi,",
-        "Life-la dreams-a thedi,",
-        "Oru pakkam CA aaga pora nee…",
-        "Innor pakkam Cinema-va direct panna pora nee…",
-        "",
-        "Books un kaiyila irundhaalum,",
-        "Un manasula eppovume oru screenplay odudhu…",
-        "Balance sheet-la profit & loss paakra nee,",
-        "Aana en life-la vandhu",
-        "Profit mattum kudutha manushan nee. ❤️",
-        "",
-        "CA exam-ku padikkira ovvoru iravum,",
-        "Un kanavukkaaga nee podra ovvoru muyarchiyum,",
-        "Oru naal…",
-        "“Action!” nu nee sollumbodhu",
-        "Andha screen-la theriyum…",
-        "Nee kadandhu vandha paadhai ellam. 🎬",
-        "",
-        "Innaiku birthday…",
-        "Aana idhu just oru birthday illa…",
-        "Un dreams rendu perum",
-        "Orey naal-la celebrate panna vendiya beginning.",
-        "",
-        "Oru naal naan proud-a sollanum…",
-        "",
-        "“Avan en CA mattum illa…",
-        "Avan oru Director.",
-        "Avan en Director mattum illa…",
-        "Avan dhaan en Forever.” ❤️",
-        "",
-        "Un calculations ellam success-a balance aaganum…",
-        "Un stories ellam blockbuster-a aaganum…",
-        "Un dreams ellam reality-a maaranum…",
-        "",
-        "And most importantly…",
-        "",
-        "Un life oda beautiful-aana",
-        "every frame-la…",
-        "Naanum irukkanum. ❤️🎬",
-        "",
-        "Happy Birthday, En CA…",
-        "My Director…",
-        "My Dreamer…",
-        "My Forever. 🫶🏻"
-    ];
-    
-    const fullText = lines.join('\n');
-    let started = false;
+/* =========================================================================
+   ACT SEVEN: THE GRAND FINALE
+   Gift box -> cake & candles -> photo memories -> letter -> finale.
+   Adapted to live inside the page (not a standalone fullscreen app):
+   canvases and scroll targets are scoped to the #celebration section.
+   ========================================================================= */
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && !started) {
-                started = true;
-                typeText(el, fullText, wish);
-            }
-        });
-    }, { threshold: 0.5 });
-    observer.observe(el);
+const birthdayName = "Manikandan";
+
+const birthdayMessage = `**En CA… En Director… En Forever ❤️**
+
+Accounts-la numbers-a thedi,
+Life-la dreams-a thedi,
+Oru pakkam **CA** aaga pora nee…
+Innor pakkam **Cinema-va direct** panna pora nee…
+
+Books un kaiyila irundhaalum,
+Un manasula eppovume oru **screenplay** odudhu…
+Balance sheet-la profit & loss paakra nee,
+Aana en life-la vandhu
+**Profit mattum kudutha manushan nee.** ❤️
+
+CA exam-ku padikkira ovvoru iravum,
+Un kanavukkaaga nee podra ovvoru muyarchiyum,
+Oru naal…
+**"Action!"** nu nee sollumbodhu
+Andha screen-la theriyum…
+Nee kadandhu vandha paadhai ellam. 🎬
+
+Innaiku birthday…
+Aana idhu just oru birthday illa…
+**Un dreams rendu perum
+Orey naal-la celebrate panna vendiya beginning.**
+
+Oru naal naan proud-a sollanum…
+
+**"Avan en CA mattum illa…
+Avan oru Director.
+Avan en Director mattum illa…
+Avan dhaan en Forever."** ❤️
+
+Un calculations ellam success-a balance aaganum…
+Un stories ellam blockbuster-a aaganum…
+Un dreams ellam reality-a maaranum…
+
+And most importantly…
+
+**Un life oda beautiful-aana
+every frame-la…
+Naanum irukkanum.** ❤️🎬
+
+**Happy Birthday, En CA…
+My Director…
+My Dreamer…
+My Forever.** 🫶🏻`;
+
+const memoryImages = [
+    { url: "photo_7.jpeg", caption: "Where It All Began 🕰️" },
+    { url: "photo_2.jpeg", caption: "Back to My Roots 🌿" },
+    { url: "photo_3.jpeg", caption: "Quiet Thoughts at Night 💭" },
+    { url: "photo_4.jpeg", caption: "Just Being Me 😌" },
+    { url: "photo_5.jpeg", caption: "Another Day at Work 💼" },
+    { url: "photo_6.jpeg", caption: "A Story Still Unfolding" },
+    { url: "photo_1.jpeg", caption: "Living the Good Times 😎" },
+    { url: "photo_8.jpeg", caption: "Ready for the Day ✨" },
+    { url: "photo_9.jpeg", caption: "Out on the Open Road 🛣️" },
+    { url: "photo_10.jpeg", caption: "Late Night in the City 🌃" },
+    { url: "main_img.jpeg", caption: "Every Chapter, Him ❤️" }
+];
+
+const cxState = {
+    isBoxOpen: false,
+    candlesLit: false,
+    candlesBlown: false,
+    cakeCut: false,
+    envelopeOpen: false,
+    micListening: false,
+    micStream: null
+};
+
+const cx = {
+    giftStage: document.getElementById('giftStage'),
+    cakeStage: document.getElementById('cakeStage'),
+    memoryStage: document.getElementById('memoryStage'),
+    letterStage: document.getElementById('letterStage'),
+    finalStage: document.getElementById('finalStage'),
+
+    giftBoxWrapper: document.getElementById('giftBoxWrapper'),
+    giftTapHint: document.getElementById('giftTapHint'),
+
+    recipientNameDisplay: document.getElementById('recipientNameDisplay'),
+    cakeStructure: document.getElementById('cakeStructure'),
+    cakeInstruction: document.getElementById('cakeInstruction'),
+    flames: [document.getElementById('flame1'), document.getElementById('flame2'), document.getElementById('flame3')],
+    candleItems: document.querySelectorAll('.candle-item'),
+    cakeKnife: document.getElementById('cakeKnife'),
+    lightCandlesBtn: document.getElementById('lightCandlesBtn'),
+    blowControls: document.getElementById('blowControls'),
+    blowCandlesBtn: document.getElementById('blowCandlesBtn'),
+    micStatusText: document.getElementById('micStatusText'),
+    cutCakeBtn: document.getElementById('cutCakeBtn'),
+    goToMemoriesBtn: document.getElementById('goToMemoriesBtn'),
+
+    polaroidGallery: document.getElementById('polaroidGallery'),
+    goToLetterBtn: document.getElementById('goToLetterBtn'),
+
+    envelope3D: document.getElementById('envelope3D'),
+    letterNameDisplay: document.getElementById('letterNameDisplay'),
+    letterBodyContent: document.getElementById('letterBodyContent'),
+    envelopeHint: document.getElementById('envelopeHint'),
+
+    finaleNameDisplay: document.getElementById('finaleNameDisplay'),
+    replayExperienceBtn: document.getElementById('replayExperienceBtn'),
+
+    ambientCanvas: document.getElementById('ambientCanvas'),
+    fxCanvas: document.getElementById('fxCanvas'),
+    root: document.getElementById('celebration')
+};
+
+/* ---------- CANVASES, SCOPED TO THE SECTION ---------- */
+let cxAmbientCtx, cxFxCtx;
+let cxAmbientParticles = [];
+let cxCelebrationParticles = [];
+let cxFireworks = [];
+let cxCanvasWidth = 0;
+let cxCanvasHeight = 0;
+
+function cxToLocal(clientX, clientY) {
+    if (!cx.root) return { x: clientX, y: clientY };
+    const rect = cx.root.getBoundingClientRect();
+    return { x: clientX - rect.left, y: clientY - rect.top };
 }
 
-function typeText(el, text, wish) {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-        el.innerHTML = text.replace(/\n/g, '<br>');
-        if (wish) wish.classList.add('show');
-        return;
+function initCxCanvases() {
+    if (!cx.ambientCanvas || !cx.fxCanvas || !cx.root) return;
+    cxAmbientCtx = cx.ambientCanvas.getContext('2d');
+    cxFxCtx = cx.fxCanvas.getContext('2d');
+    resizeCxCanvases();
+    window.addEventListener('resize', resizeCxCanvases);
+
+    cxAmbientParticles = [];
+    const starCount = Math.min(Math.floor((cxCanvasWidth * cxCanvasHeight) / 12000), 90);
+    for (let i = 0; i < starCount; i++) {
+        cxAmbientParticles.push({
+            x: Math.random() * cxCanvasWidth,
+            y: Math.random() * cxCanvasHeight,
+            radius: Math.random() * 1.8 + 0.5,
+            alpha: Math.random() * 0.7 + 0.3,
+            alphaSpeed: (Math.random() * 0.02 + 0.005) * (Math.random() > 0.5 ? 1 : -1),
+            vy: Math.random() * 0.25 + 0.05,
+            color: ['#e3bd63', '#f6f1e4', '#ffffff', '#cfd6c6'][Math.floor(Math.random() * 4)]
+        });
     }
 
-    let i = 0;
-    const cursor = '<span class="tw-cursor"></span>';
-    const speed = 28;
+    requestAnimationFrame(renderCxAmbientLoop);
+    requestAnimationFrame(renderCxFxLoop);
+}
 
-    function step() {
-        if (i <= text.length) {
-            const shown = text.substring(0, i).replace(/\n/g, '<br>');
-            el.innerHTML = shown + cursor;
-            i++;
-            setTimeout(step, speed);
+function resizeCxCanvases() {
+    if (!cx.root) return;
+    cxCanvasWidth = cx.root.clientWidth;
+    cxCanvasHeight = Math.max(cx.root.clientHeight, 640);
+    cx.ambientCanvas.width = cxCanvasWidth;
+    cx.ambientCanvas.height = cxCanvasHeight;
+    cx.fxCanvas.width = cxCanvasWidth;
+    cx.fxCanvas.height = cxCanvasHeight;
+}
+
+function renderCxAmbientLoop() {
+    cxAmbientCtx.clearRect(0, 0, cxCanvasWidth, cxCanvasHeight);
+    for (const p of cxAmbientParticles) {
+        p.y -= p.vy;
+        if (p.y < 0) { p.y = cxCanvasHeight; p.x = Math.random() * cxCanvasWidth; }
+        p.alpha += p.alphaSpeed;
+        if (p.alpha > 0.95 || p.alpha < 0.2) p.alphaSpeed = -p.alphaSpeed;
+
+        cxAmbientCtx.beginPath();
+        cxAmbientCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        cxAmbientCtx.fillStyle = p.color;
+        cxAmbientCtx.globalAlpha = Math.max(0, Math.min(1, p.alpha));
+        cxAmbientCtx.shadowBlur = 8;
+        cxAmbientCtx.shadowColor = p.color;
+        cxAmbientCtx.fill();
+    }
+    cxAmbientCtx.globalAlpha = 1;
+    cxAmbientCtx.shadowBlur = 0;
+    requestAnimationFrame(renderCxAmbientLoop);
+}
+
+function renderCxFxLoop() {
+    cxFxCtx.clearRect(0, 0, cxCanvasWidth, cxCanvasHeight);
+
+    for (let i = cxCelebrationParticles.length - 1; i >= 0; i--) {
+        const p = cxCelebrationParticles[i];
+        p.x += p.vx; p.y += p.vy; p.vy += p.gravity;
+        p.rotation += p.rotSpeed; p.alpha -= p.decay;
+        if (p.alpha <= 0 || p.y > cxCanvasHeight + 50) { cxCelebrationParticles.splice(i, 1); continue; }
+
+        cxFxCtx.save();
+        cxFxCtx.translate(p.x, p.y);
+        cxFxCtx.rotate(p.rotation);
+        cxFxCtx.globalAlpha = Math.max(0, p.alpha);
+
+        if (p.shape === 'rect') {
+            cxFxCtx.fillStyle = p.color;
+            cxFxCtx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+        } else if (p.shape === 'heart') {
+            cxFxCtx.fillStyle = p.color;
+            cxDrawHeart(cxFxCtx, 0, 0, p.size);
+        } else if (p.shape === 'star') {
+            cxFxCtx.fillStyle = p.color;
+            cxDrawStar(cxFxCtx, 0, 0, 5, p.size, p.size / 2);
         } else {
-            el.innerHTML = text.replace(/\n/g, '<br>');
-            if (wish) setTimeout(() => wish.classList.add('show'), 300);
+            cxFxCtx.beginPath();
+            cxFxCtx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+            cxFxCtx.fillStyle = p.color;
+            cxFxCtx.fill();
+        }
+        cxFxCtx.restore();
+    }
+
+    for (let i = cxFireworks.length - 1; i >= 0; i--) {
+        const fw = cxFireworks[i];
+        if (!fw.exploded) {
+            fw.x += fw.vx; fw.y += fw.vy; fw.vy += 0.08;
+            cxFxCtx.beginPath();
+            cxFxCtx.arc(fw.x, fw.y, 3, 0, Math.PI * 2);
+            cxFxCtx.fillStyle = '#f1d78c';
+            cxFxCtx.shadowBlur = 10;
+            cxFxCtx.shadowColor = '#c99a3f';
+            cxFxCtx.fill();
+            cxFxCtx.shadowBlur = 0;
+
+            if (fw.vy >= -0.5 || fw.y <= fw.targetY) {
+                fw.exploded = true;
+                cxCreateFireworkBurst(fw.x, fw.y, fw.color);
+                cxFireworks.splice(i, 1);
+            }
         }
     }
-    step();
+    requestAnimationFrame(renderCxFxLoop);
 }
+
+function cxDrawHeart(ctx, x, y, size) {
+    ctx.beginPath();
+    const t = size * 0.3;
+    ctx.moveTo(x, y + t);
+    ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + t);
+    ctx.bezierCurveTo(x - size / 2, y + (size + t) / 2, x, y + size, x, y + size);
+    ctx.bezierCurveTo(x, y + size, x + size / 2, y + (size + t) / 2, x + size / 2, y + t);
+    ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + t);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function cxDrawStar(ctx, cx0, cy, spikes, outerR, innerR) {
+    let rot = Math.PI / 2 * 3, x = cx0, y = cy;
+    const step = Math.PI / spikes;
+    ctx.beginPath();
+    ctx.moveTo(cx0, cy - outerR);
+    for (let i = 0; i < spikes; i++) {
+        x = cx0 + Math.cos(rot) * outerR; y = cy + Math.sin(rot) * outerR;
+        ctx.lineTo(x, y); rot += step;
+        x = cx0 + Math.cos(rot) * innerR; y = cy + Math.sin(rot) * innerR;
+        ctx.lineTo(x, y); rot += step;
+    }
+    ctx.lineTo(cx0, cy - outerR);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function cxLaunchConfetti(count = 90, originX = cxCanvasWidth / 2, originY = cxCanvasHeight / 2) {
+    const colors = ['#7c2a2a', '#c99a3f', '#33473b', '#e3bd63', '#f6f1e4', '#ffffff', '#a67a2e'];
+    const shapes = ['rect', 'rect', 'heart', 'star', 'sparkle'];
+    for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 12 + 4;
+        cxCelebrationParticles.push({
+            x: originX, y: originY,
+            vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 5,
+            gravity: 0.25, size: Math.random() * 10 + 6,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            shape: shapes[Math.floor(Math.random() * shapes.length)],
+            rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.2,
+            alpha: 1, decay: Math.random() * 0.008 + 0.005
+        });
+    }
+}
+
+function cxLaunchFirework() {
+    const startX = Math.random() * (cxCanvasWidth * 0.8) + cxCanvasWidth * 0.1;
+    const targetY = Math.random() * (cxCanvasHeight * 0.4) + cxCanvasHeight * 0.15;
+    const colors = ['#7c2a2a', '#c99a3f', '#e3bd63', '#33473b', '#a67a2e'];
+    cxFireworks.push({
+        x: startX, y: cxCanvasHeight,
+        vx: (Math.random() - 0.5) * 2, vy: -(Math.random() * 4 + 10),
+        targetY, color: colors[Math.floor(Math.random() * colors.length)], exploded: false
+    });
+}
+
+function cxCreateFireworkBurst(x, y, color) {
+    const count = 50;
+    for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 / count) * i + (Math.random() * 0.2);
+        const speed = Math.random() * 7 + 2;
+        cxCelebrationParticles.push({
+            x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+            gravity: 0.12, size: Math.random() * 6 + 3, color,
+            shape: Math.random() > 0.4 ? 'sparkle' : 'star',
+            rotation: 0, rotSpeed: 0, alpha: 1, decay: Math.random() * 0.015 + 0.01
+        });
+    }
+}
+
+function cxLaunchCelebration() {
+    cxLaunchConfetti(120, cxCanvasWidth / 2, cxCanvasHeight * 0.4);
+    for (let i = 0; i < 4; i++) setTimeout(cxLaunchFirework, i * 350);
+}
+
+/* ---------- STAGE CONTROLLER ---------- */
+function cxSwitchStage(fromStage, toStage) {
+    fromStage.classList.remove('active-stage');
+    setTimeout(() => {
+        fromStage.classList.add('hidden-stage');
+        toStage.classList.remove('hidden-stage');
+        void toStage.offsetWidth;
+        toStage.classList.add('active-stage');
+        resizeCxCanvases();
+        if (cx.root) cx.root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 600);
+}
+
+function cxOpenGift() {
+    if (cxState.isBoxOpen) return;
+    cxState.isBoxOpen = true;
+
+    cx.giftTapHint.style.display = 'none';
+    cx.giftBoxWrapper.classList.add('opening');
+
+    const rect = cx.giftBoxWrapper.getBoundingClientRect();
+    const local = cxToLocal(rect.left + rect.width / 2, rect.top + rect.height / 2 - 40);
+
+    setTimeout(() => {
+        cx.giftBoxWrapper.classList.add('box-opened');
+        cxLaunchConfetti(80, local.x, local.y);
+    }, 450);
+
+    setTimeout(() => { cxRevealCake(); }, 1600);
+}
+
+function cxRevealCake() {
+    cxSwitchStage(cx.giftStage, cx.cakeStage);
+    cx.recipientNameDisplay.textContent = birthdayName;
+    setTimeout(() => { cxLaunchConfetti(50, cxCanvasWidth / 2, cxCanvasHeight * 0.35); }, 800);
+}
+
+/* Candles, blow, and cut keep their full visual animation + confetti —
+   only the sound effects tied to these specific actions are muted.
+   Background music (top-right toggle) is unaffected. */
+function cxLightCandles() {
+    if (cxState.candlesLit) return;
+    cxState.candlesLit = true;
+    cx.lightCandlesBtn.classList.add('hidden');
+
+    cx.flames.forEach((flame, index) => {
+        setTimeout(() => {
+            flame.classList.add('lit');
+            const flameRect = flame.getBoundingClientRect();
+            const local = cxToLocal(flameRect.left + flameRect.width / 2, flameRect.top);
+            cxLaunchConfetti(12, local.x, local.y);
+        }, index * 400);
+    });
+
+    setTimeout(() => {
+        cx.cakeInstruction.textContent = "Now make a wish and blow the candles 💨";
+        cx.blowControls.classList.remove('hidden');
+        cxStartBlowDetection();
+    }, 1500);
+}
+
+function cxStartBlowDetection() {
+    if (cxState.candlesBlown || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        cx.micStatusText.textContent = "Tap the button below to blow! 💨";
+        return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then(stream => {
+            cxState.micStream = stream;
+            cxState.micListening = true;
+            cx.micStatusText.textContent = "Mic active! Blow directly on your screen/mic 💨";
+
+            const micCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = micCtx.createAnalyser();
+            const microphone = micCtx.createMediaStreamSource(stream);
+            analyser.fftSize = 512;
+            microphone.connect(analyser);
+
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function checkAudioLevel() {
+                if (!cxState.micListening || cxState.candlesBlown) {
+                    stream.getTracks().forEach(track => track.stop());
+                    return;
+                }
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+                const average = sum / bufferLength;
+                if (average > 55) {
+                    cxExtinguishCandles();
+                    stream.getTracks().forEach(track => track.stop());
+                    return;
+                }
+                requestAnimationFrame(checkAudioLevel);
+            }
+            checkAudioLevel();
+        })
+        .catch(() => {
+            cx.micStatusText.textContent = "Tap the button below to blow! 💨";
+        });
+}
+
+function cxExtinguishCandles() {
+    if (cxState.candlesBlown) return;
+    cxState.candlesBlown = true;
+    cxState.micListening = false;
+
+    cx.flames.forEach(flame => flame.classList.remove('lit'));
+    cx.candleItems.forEach(item => item.classList.add('smoke-rise'));
+
+    cx.blowControls.classList.add('hidden');
+    cx.cakeInstruction.textContent = "Wish made! Now let's cut the cake! 🎂";
+
+    setTimeout(() => {
+        cxLaunchConfetti(45, cxCanvasWidth / 2, cxCanvasHeight * 0.4);
+        cx.cakeKnife.classList.add('visible');
+        cx.cutCakeBtn.classList.remove('hidden');
+    }, 900);
+}
+
+function cxCutCake() {
+    if (cxState.cakeCut) return;
+    cxState.cakeCut = true;
+    cx.cutCakeBtn.classList.add('hidden');
+    cx.cakeKnife.classList.add('cutting');
+
+    setTimeout(() => {
+        cx.cakeStructure.classList.add('cake-cut-active');
+        cxLaunchCelebration();
+        cx.cakeInstruction.textContent = "Slice shared with love! ❤️";
+        cx.goToMemoriesBtn.classList.remove('hidden');
+    }, 700);
+}
+
+function cxPopulateMemories() {
+    cx.polaroidGallery.innerHTML = '';
+    const rotations = [-3, 2.5, -2, 3, -2.5, 2];
+
+    memoryImages.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'polaroid-card';
+        card.style.transform = `rotate(${rotations[index % rotations.length]}deg)`;
+        card.innerHTML = `
+            <div class="card-tape"></div>
+            <div class="photo-wrapper"><img src="${item.url}" alt="Memory ${index + 1}" loading="lazy"></div>
+            <p class="photo-caption">${item.caption}</p>
+        `;
+        card.addEventListener('click', () => {
+            const cardRect = card.getBoundingClientRect();
+            const local = cxToLocal(cardRect.left + 100, cardRect.top + 100);
+            cxLaunchConfetti(15, local.x, local.y);
+        });
+        cx.polaroidGallery.appendChild(card);
+    });
+}
+
+function cxShowMemories() {
+    cxPopulateMemories();
+    cxSwitchStage(cx.cakeStage, cx.memoryStage);
+}
+
+/* Turn **bold** markers into <strong>, keep line breaks (the CSS on
+   .letter-body-text uses white-space: pre-line to render them). */
+function cxFormatLetter(text) {
+    const escaped = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    return escaped.replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>');
+}
+
+function cxShowLetterStage() {
+    cx.letterNameDisplay.textContent = birthdayName;
+    cx.letterBodyContent.innerHTML = cxFormatLetter(birthdayMessage);
+    cxSwitchStage(cx.memoryStage, cx.letterStage);
+}
+
+function cxOpenLetter() {
+    if (cxState.envelopeOpen) return;
+    cxState.envelopeOpen = true;
+
+    cx.envelope3D.classList.add('envelope-open');
+    cx.envelopeHint.style.display = 'none';
+    cxLaunchConfetti(60, cxCanvasWidth / 2, cxCanvasHeight * 0.45);
+
+    // No button here — the letter is long, so give plenty of quiet
+    // reading time before moving on to the finale by itself.
+    setTimeout(() => { cxShowFinalScreen(); }, 26000);
+}
+
+function cxShowFinalScreen() {
+    cx.finaleNameDisplay.textContent = birthdayName;
+    cxSwitchStage(cx.letterStage, cx.finalStage);
+    setTimeout(() => { cxLaunchCelebration(); }, 600);
+}
+
+function cxReplayExperience() {
+    cxState.isBoxOpen = false;
+    cxState.candlesLit = false;
+    cxState.candlesBlown = false;
+    cxState.cakeCut = false;
+    cxState.envelopeOpen = false;
+
+    cx.giftTapHint.style.display = 'flex';
+    cx.giftBoxWrapper.classList.remove('opening', 'box-opened');
+    cx.flames.forEach(f => f.classList.remove('lit'));
+    cx.candleItems.forEach(item => item.classList.remove('smoke-rise'));
+    cx.cakeStructure.classList.remove('cake-cut-active');
+    cx.cakeKnife.classList.remove('visible', 'cutting');
+    cx.cakeInstruction.textContent = "Make a wish... ✨";
+    cx.lightCandlesBtn.classList.remove('hidden');
+    cx.blowControls.classList.add('hidden');
+    cx.cutCakeBtn.classList.add('hidden');
+    cx.goToMemoriesBtn.classList.add('hidden');
+
+    cx.envelope3D.classList.remove('envelope-open');
+    cx.envelopeHint.style.display = 'block';
+
+    cxSwitchStage(cx.finalStage, cx.giftStage);
+}
+
+function initCxEventListeners() {
+    if (!cx.giftBoxWrapper) return; // celebration section not present
+
+    cx.giftBoxWrapper.addEventListener('click', cxOpenGift);
+    cx.giftBoxWrapper.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cxOpenGift(); }
+    });
+
+    cx.lightCandlesBtn.addEventListener('click', cxLightCandles);
+    cx.blowCandlesBtn.addEventListener('click', cxExtinguishCandles);
+    cx.cutCakeBtn.addEventListener('click', cxCutCake);
+    cx.goToMemoriesBtn.addEventListener('click', cxShowMemories);
+
+    cx.goToLetterBtn.addEventListener('click', cxShowLetterStage);
+
+    cx.envelope3D.addEventListener('click', cxOpenLetter);
+    cx.envelope3D.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cxOpenLetter(); }
+    });
+
+    cx.replayExperienceBtn.addEventListener('click', cxReplayExperience);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!document.getElementById('celebration')) return;
+    initCxCanvases();
+    initCxEventListeners();
+});
