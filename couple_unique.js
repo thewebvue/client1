@@ -19,6 +19,7 @@ function initBgMusic() {
     if (!bgMusic || !toggle) return;
 
     let playing = false;
+    window.bgMusicWasAutoPaused = false; // Track if we auto-paused it
 
     function setUI(isPlaying) {
         playing = isPlaying;
@@ -31,6 +32,22 @@ function initBgMusic() {
     function tryPlay() {
         bgMusic.play().then(() => setUI(true)).catch(() => setUI(false));
     }
+
+    // Global functions to handle music state from modals
+    window.pauseBgMusic = function() {
+        if (playing) {
+            bgMusic.pause();
+            setUI(false);
+            window.bgMusicWasAutoPaused = true;
+        }
+    };
+
+    window.resumeBgMusic = function() {
+        if (window.bgMusicWasAutoPaused) {
+            tryPlay();
+            window.bgMusicWasAutoPaused = false;
+        }
+    };
 
     // Try to autoplay as soon as the page loads.
     tryPlay();
@@ -52,8 +69,10 @@ function initBgMusic() {
         if (playing) {
             bgMusic.pause();
             setUI(false);
+            window.bgMusicWasAutoPaused = false; // User paused it manually, clear the auto-flag
         } else {
             tryPlay();
+            window.bgMusicWasAutoPaused = false; // User played it manually, clear the auto-flag
         }
     });
 }
@@ -138,6 +157,9 @@ function playAudio() {
             alert("Couldn't auto-play the audio — tap the picture again, or check that audio.mp4 is uploaded next to your HTML file.");
         });
     }
+
+    // Pause Background Music while special audio plays
+    if (window.pauseBgMusic) window.pauseBgMusic();
 }
 
 /* ---------- PUZZLE: slide the tiles to rebuild the picture ---------- */
@@ -348,15 +370,28 @@ function showResult() {
 }
 
 /* ---------- MODAL / LIGHTBOX (images + video reveals) ---------- */
-function openModal(src, captionText, type = 'image') {
+let currentNextSrc = null;
+
+function openModal(src, captionText, type = 'image', nextSrc = null) {
     const modal = document.getElementById("imageModal");
     const modalImg = document.getElementById("modalImg");
     const modalVideo = document.getElementById("modalVideo");
     const caption = document.getElementById("modalCaption");
+    const nextBtn = document.getElementById("modalNextBtn");
 
     if(!modal) return;
     modal.style.display = "block";
     if(caption) caption.innerHTML = captionText;
+
+    // Track if there's a second video to play
+    currentNextSrc = nextSrc;
+    if (nextBtn) {
+        if (nextSrc) {
+            nextBtn.style.display = "block";
+        } else {
+            nextBtn.style.display = "none";
+        }
+    }
 
     if (type === 'video') {
         if(modalImg) modalImg.style.display = "none";
@@ -367,6 +402,10 @@ function openModal(src, captionText, type = 'image') {
             modalVideo.currentTime = 0;
             modalVideo.play().catch(() => {});
         }
+
+        // Pause Background Music while video plays
+        if (window.pauseBgMusic) window.pauseBgMusic();
+
     } else {
         if(modalVideo) {
             modalVideo.pause();
@@ -380,14 +419,36 @@ function openModal(src, captionText, type = 'image') {
     }
 }
 
+function playNextVideo() {
+    if (currentNextSrc) {
+        const modalVideo = document.getElementById("modalVideo");
+        if (modalVideo) {
+            modalVideo.src = currentNextSrc;
+            modalVideo.currentTime = 0;
+            modalVideo.play().catch(() => {});
+        }
+        
+        // Hide button so they can't click 'Next' infinitely
+        const nextBtn = document.getElementById("modalNextBtn");
+        if (nextBtn) nextBtn.style.display = "none";
+        currentNextSrc = null;
+    }
+}
+
 function closeModal() {
     const modal = document.getElementById("imageModal");
     const modalVideo = document.getElementById("modalVideo");
     const specialAudio = document.getElementById("specialAudio");
+    const nextBtn = document.getElementById("modalNextBtn");
     
     if (modalVideo) modalVideo.pause();
     if (specialAudio) specialAudio.pause();
     if (modal) modal.style.display = "none";
+    if (nextBtn) nextBtn.style.display = "none";
+    currentNextSrc = null; // Clear out state
+
+    // Resume Background Music when modal closes
+    if (window.resumeBgMusic) window.resumeBgMusic();
 }
 
 window.onclick = function (event) {
@@ -435,7 +496,7 @@ function initTimelineReveal() {
    canvases and scroll targets are scoped to the #celebration section.
    ========================================================================= */
 
-const birthdayName = "Manikandan";
+const birthdayName = "Mani Mama";
 
 const birthdayMessage = `**En CA… En Director… En Forever ❤️**
 
