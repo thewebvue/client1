@@ -474,6 +474,28 @@ nav {
     line-height: 1;
 }
 .close-modal:hover { color: var(--gold); }
+
+/* --- NEXT VIDEO BUTTON STYLES --- */
+.modal-next-btn {
+    display: none;
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    background: transparent;
+    color: var(--gold-bright);
+    border: 1px solid var(--gold);
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+    z-index: 3001;
+}
+.modal-next-btn:hover {
+    background: var(--gold);
+    color: var(--ink);
+}
+
 @keyframes zoomIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
 /* ---------- ACT TWO: THE PUZZLE ---------- */
@@ -712,6 +734,7 @@ nav {
     .nav-links a { font-size: 1.1rem; opacity: 1; }
     .nav-links .btn-special { margin-top: 10px; }
     .section-container { padding: var(--space-lg) 6vw; }
+    .modal-next-btn { right: 20px; bottom: 20px; font-size: 1rem; padding: 8px 16px; }
 }
 /* =========================================================================
    ACT SEVEN: THE GRAND FINALE — gift box, cake, memories, letter, finale
