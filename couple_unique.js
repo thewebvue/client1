@@ -370,9 +370,9 @@ function showResult() {
 }
 
 /* ---------- MODAL / LIGHTBOX (images + video reveals) ---------- */
-let currentNextSrc = null;
+let nextVideoQueue = []; // Now stores an array of upcoming videos
 
-function openModal(src, captionText, type = 'image', nextSrc = null) {
+function openModal(src, captionText, type = 'image', nextVideos = []) {
     const modal = document.getElementById("imageModal");
     const modalImg = document.getElementById("modalImg");
     const modalVideo = document.getElementById("modalVideo");
@@ -383,10 +383,15 @@ function openModal(src, captionText, type = 'image', nextSrc = null) {
     modal.style.display = "block";
     if(caption) caption.innerHTML = captionText;
 
-    // Track if there's a second video to play
-    currentNextSrc = nextSrc;
+    // Track if there's a second (or third) video to play
+    if (typeof nextVideos === 'string') {
+        nextVideoQueue = [nextVideos];
+    } else {
+        nextVideoQueue = [...(nextVideos || [])];
+    }
+
     if (nextBtn) {
-        if (nextSrc) {
+        if (nextVideoQueue.length > 0) {
             nextBtn.style.display = "block";
         } else {
             nextBtn.style.display = "none";
@@ -420,18 +425,23 @@ function openModal(src, captionText, type = 'image', nextSrc = null) {
 }
 
 function playNextVideo() {
-    if (currentNextSrc) {
+    if (nextVideoQueue.length > 0) {
+        const nextSrc = nextVideoQueue.shift(); // Get first in line and remove it
+        
         const modalVideo = document.getElementById("modalVideo");
         if (modalVideo) {
-            modalVideo.src = currentNextSrc;
+            modalVideo.src = nextSrc;
             modalVideo.currentTime = 0;
             modalVideo.play().catch(() => {});
         }
         
-        // Hide button so they can't click 'Next' infinitely
+        // Hide button if the queue is now empty
         const nextBtn = document.getElementById("modalNextBtn");
-        if (nextBtn) nextBtn.style.display = "none";
-        currentNextSrc = null;
+        if (nextBtn) {
+            if (nextVideoQueue.length === 0) {
+                nextBtn.style.display = "none";
+            }
+        }
     }
 }
 
@@ -445,7 +455,9 @@ function closeModal() {
     if (specialAudio) specialAudio.pause();
     if (modal) modal.style.display = "none";
     if (nextBtn) nextBtn.style.display = "none";
-    currentNextSrc = null; // Clear out state
+    
+    // Clear out state
+    nextVideoQueue = []; 
 
     // Resume Background Music when modal closes
     if (window.resumeBgMusic) window.resumeBgMusic();
