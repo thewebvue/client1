@@ -678,6 +678,7 @@ Aana idhu just oru birthday illa…
 Orey naal-la celebrate panna vendiya beginning.**
 
 Oru naal naan proud-a sollanum…
+
 **"Avan en CA mattum illa…
 Avan oru Director.
 Avan en Director mattum illa…
@@ -696,10 +697,7 @@ Naanum irukkanum.** ❤️🎬
 **Happy Birthday, En CA…
 My Director…
 My Dreamer…
-My Forever.** 🫶🏻
-................               
-                     `
-;
+My Forever.** 🫶🏻`;
 
 const memoryImages = [
     { url: "photo_7.jpeg", caption: "Where It All Began 🕰️" },
@@ -1138,8 +1136,17 @@ function cxFormatLetter(text) {
 }
 
 function cxShowLetterStage() {
-    cx.letterNameDisplay.textContent = birthdayName;
-    cx.letterBodyContent.innerHTML = cxFormatLetter(birthdayMessage);
+    if (cx.letterNameDisplay) cx.letterNameDisplay.textContent = birthdayName;
+    if (cx.letterBodyContent) {
+        cx.letterBodyContent.innerHTML = cxFormatLetter(birthdayMessage);
+        cx.letterBodyContent.style.whiteSpace = 'pre-line';
+        cx.letterBodyContent.style.overflowY = 'auto';
+        cx.letterBodyContent.style.maxHeight = '65vh';
+        if (cx.letterBodyContent.parentElement) {
+            cx.letterBodyContent.parentElement.style.overflowY = 'auto';
+            cx.letterBodyContent.parentElement.style.maxHeight = '80vh';
+        }
+    }
     cxSwitchStage(cx.memoryStage, cx.letterStage);
 }
 
