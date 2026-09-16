@@ -3,14 +3,156 @@
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-    runOpeningSequence();
+    // Opening Sequence and background music are deferred until the
+    // gate is unlocked — see initResolutionGate() below.
+    initResolutionGate();
+
     duplicateFilmstrip();
     initQuiz();
     initPuzzle();
     initTimelineReveal();
     initNavToggle();
-    initBgMusic();
 });
+
+/* ---------- RESOLUTION GATE: one question at a time, No is unpickable ---------- */
+function initResolutionGate() {
+    const gate = document.getElementById('resolutionGate');
+    if (!gate) return;
+
+    const stage = document.getElementById('resStage');
+    const allItems = Array.from(stage.querySelectorAll('.res-item'));
+    const finalPanel = stage.querySelector('.res-final');
+    const questionItems = allItems.filter(i => i !== finalPanel);
+    const dotsWrap = document.getElementById('resProgressDots');
+    const stepLabel = document.getElementById('resStepLabel');
+
+    // Prevent scrolling while gate is active
+    document.body.style.overflow = 'hidden';
+    window.scrollTo(0, 0);
+
+    // Progress dots, one per resolution question
+    questionItems.forEach(() => {
+        const d = document.createElement('span');
+        d.className = 'dot';
+        dotsWrap.appendChild(d);
+    });
+    const dots = Array.from(dotsWrap.children);
+    let currentIndex = 0;
+
+    function updateDots() {
+        dots.forEach((d, i) => {
+            d.classList.toggle('done', i < currentIndex);
+            d.classList.toggle('current', i === currentIndex);
+        });
+    }
+
+    function showStep(index) {
+        allItems.forEach(item => item.classList.remove('active'));
+        if (index < questionItems.length) {
+            questionItems[index].classList.add('active');
+            stepLabel.textContent = `Question ${index + 1} of ${questionItems.length}`;
+        } else {
+            finalPanel.classList.add('active');
+            stepLabel.textContent = `All Promises Sealed`;
+        }
+        updateDots();
+    }
+
+    function showBubble(item, text, left, top) {
+        const bubble = item.querySelector('.res-funny-bubble');
+        if (!bubble) return;
+        bubble.textContent = text;
+        bubble.style.left = left + 'px';
+        bubble.style.top = top + 'px';
+        bubble.classList.add('show');
+        clearTimeout(bubble._hideTimer);
+        bubble._hideTimer = setTimeout(() => bubble.classList.remove('show'), 1200);
+    }
+
+    questionItems.forEach((item) => {
+        const yesBtn = item.querySelector('.res-yes');
+        const noBtn = item.querySelector('.res-no');
+        if (!yesBtn || !noBtn) return;
+
+        let dodgeCount = 0;
+        let tucked = false;
+        let isDodging = false;
+
+        function dodge() {
+            if (tucked || isDodging) return;
+            isDodging = true;
+            dodgeCount++;
+
+            // User gets 3 tries to click No
+            if (dodgeCount > 3) {
+                tuckBehindYes();
+                return;
+            }
+
+            const zone = item.querySelector('.res-choice');
+            const zoneRect = zone.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+            
+            // Calculate a safe random spot inside the container
+            const maxLeft = Math.max(zoneRect.width - btnRect.width, 10);
+            const maxTop = Math.max(zoneRect.height - btnRect.height, 10);
+            const newLeft = Math.random() * maxLeft;
+            const newTop = Math.random() * maxTop;
+
+            // Apply new position
+            noBtn.style.left = newLeft + 'px';
+            noBtn.style.top = newTop + 'px';
+            noBtn.style.transform = 'translate(0, 0)'; // removing the initial -50% centering
+            
+            // Funny messages
+            let messages = ["Nice try! 😅", "Missed me! 😂", "Too slow! 😝"];
+            showBubble(item, messages[dodgeCount - 1], newLeft + (btnRect.width / 2), newTop);
+
+            // Brief cooldown to prevent accidental double-clicks from maxing it out instantly
+            setTimeout(() => { isDodging = false; }, 300);
+        }
+
+        function tuckBehindYes() {
+            tucked = true;
+            const zone = item.querySelector('.res-choice');
+            const zoneRect = zone.getBoundingClientRect();
+            const yesRect = yesBtn.getBoundingClientRect();
+            
+            noBtn.style.left = (yesRect.left - zoneRect.left) + 'px';
+            noBtn.style.top = (yesRect.top - zoneRect.top) + 'px';
+            noBtn.style.width = yesRect.width + 'px';
+            noBtn.style.height = yesRect.height + 'px';
+            noBtn.style.transform = 'translate(0, 0)';
+            noBtn.classList.add('tucked');
+            
+            showBubble(item, "Nowhere left to hide! 🎬", (yesRect.left - zoneRect.left) + (yesRect.width / 2), (yesRect.top - zoneRect.top));
+        }
+
+        // We removed hover/mousemove. It ONLY triggers on click or touch.
+        noBtn.addEventListener('click', (e) => { e.preventDefault(); dodge(); });
+        noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); dodge(); }, { passive: false });
+
+        yesBtn.addEventListener('click', () => {
+            if (!item.classList.contains('active')) return;
+            currentIndex++;
+            showStep(currentIndex);
+
+            if (currentIndex >= questionItems.length) {
+                // Last promise sealed — auto-unlock into the site
+                setTimeout(() => {
+                    gate.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    setTimeout(() => {
+                        runOpeningSequence();
+                        initBgMusic();
+                    }, 500);
+                }, 1600);
+            }
+        });
+    });
+
+    showStep(0);
+}
 
 /* ---------- SITE-WIDE BACKGROUND MUSIC ---------- */
 function initBgMusic() {
@@ -555,19 +697,21 @@ Naanum irukkanum.** ❤️🎬
 **Happy Birthday, En CA…
 My Director…
 My Dreamer…
-My Forever.** 🫶🏻`;
+My Forever.** 🫶🏻
+                     `
+;
 
 const memoryImages = [
     { url: "photo_7.jpeg", caption: "Where It All Began 🕰️" },
-    { url: "photo_2.jpeg", caption: "Back to My Roots 🌿" },
+    { url: "photo_2.jpeg", caption: "Back to Our Roots 🌿" },
     { url: "photo_3.jpeg", caption: "Quiet Thoughts at Night 💭" },
-    { url: "photo_4.jpeg", caption: "Just Being Me 😌" },
+    { url: "photo_4.jpeg", caption: "Just Being U 😌" },
     { url: "photo_5.jpeg", caption: "Another Day at Work 💼" },
     { url: "photo_6.jpeg", caption: "A Story Still Unfolding" },
     { url: "photo_1.jpeg", caption: "Living the Good Times 😎" },
     { url: "photo_8.jpeg", caption: "Ready for the Day ✨" },
     { url: "photo_9.jpeg", caption: "Out on the Open Road 🛣️" },
-    { url: "photo_10.jpeg", caption: "Late Night in the City 🌃" },
+    { url: "photo_10.jpeg", caption: "Late Night in Sea Shore 🌃" },
     { url: "Main_img.jpeg", caption: "Every Chapter, Him ❤️" }
 ];
 
@@ -1009,7 +1153,7 @@ function cxOpenLetter() {
 
     // No button here — the letter is long, so give plenty of quiet
     // reading time before moving on to the finale by itself.
-    setTimeout(() => { cxShowFinalScreen(); }, 26000);
+    setTimeout(() => { cxShowFinalScreen(); }, 60000);
 }
 
 function cxShowFinalScreen() {
