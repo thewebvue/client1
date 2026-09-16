@@ -12,6 +12,90 @@
     <!-- FILM GRAIN TEXTURE -->
     <div id="grainOverlay"></div>
 
+    <!-- RESOLUTION GATE -->
+    <div id="resolutionGate">
+        <div class="resolution-card">
+            <span class="gate-reel-tag">Before Take One</span>
+            <h2 class="gate-title">The Pre-Screening Contract 📜</h2>
+            <p class="gate-sub">Before we roll the cameras, you must accept M2's Birthday Resolutions. There's only one honest answer here.</p>
+
+            <div class="res-progress-top">
+                <div class="res-progress-dots" id="resProgressDots"></div>
+                <span class="res-step-label" id="resStepLabel">Question 1 of 5</span>
+            </div>
+
+            <div class="res-stage" id="resStage">
+                <div class="res-item">
+                    <span class="res-text">
+                        <strong>1. Wake up early by 6 AM daily</strong><br>
+                        <small>*(Actually waking up, not just snoozing 15 times. W.e.f 1st Oct)*</small>
+                    </span>
+                    <div class="res-choice">
+                        <button type="button" class="res-yes">Yes, I Promise <span class="clap">🎬</span></button>
+                        <button type="button" class="res-no">No</button>
+                        <div class="res-funny-bubble">Hey, don't do like that 😅</div>
+                    </div>
+                </div>
+
+                <div class="res-item">
+                    <span class="res-text">
+                        <strong>2. Daily 30 min warm-up / walk</strong><br>
+                        <small>*(Walking to the fridge doesn't count. W.e.f 1st Oct)*</small>
+                    </span>
+                    <div class="res-choice">
+                        <button type="button" class="res-yes">Yes, I Promise <span class="clap">🎬</span></button>
+                        <button type="button" class="res-no">No</button>
+                        <div class="res-funny-bubble">Hey, don't do like that 😅</div>
+                    </div>
+                </div>
+
+                <div class="res-item">
+                    <span class="res-text">
+                        <strong>3. Charge the mobile daily</strong><br>
+                        <small>*(Because 0% is not a personality trait. W.e.f 19th Sept)*</small>
+                    </span>
+                    <div class="res-choice">
+                        <button type="button" class="res-yes">Yes, I Promise <span class="clap">🎬</span></button>
+                        <button type="button" class="res-no">No</button>
+                        <div class="res-funny-bubble">Hey, don't do like that 😅</div>
+                    </div>
+                </div>
+
+                <div class="res-item">
+                    <span class="res-text">
+                        <strong>4. No cigarettes &amp; drinks</strong><br>
+                        <small>*(Strictly water, tea, and good vibes. W.e.f 1st Oct)*</small>
+                    </span>
+                    <div class="res-choice">
+                        <button type="button" class="res-yes">Yes, I Promise <span class="clap">🎬</span></button>
+                        <button type="button" class="res-no">No</button>
+                        <div class="res-funny-bubble">Hey, don't do like that 😅</div>
+                    </div>
+                </div>
+
+                <div class="res-item">
+                    <span class="res-text">
+                        <strong>5. CA Intermediate study plan</strong><br>
+                        <small>*(Because "CA Manikandan" sounds too good to mess up. W.e.f 1st Oct)*</small>
+                    </span>
+                    <div class="res-choice">
+                        <button type="button" class="res-yes">Yes, I Promise <span class="clap">🎬</span></button>
+                        <button type="button" class="res-no">No</button>
+                        <div class="res-funny-bubble">Hey, don't do like that 😅</div>
+                    </div>
+                </div>
+
+                <div class="res-item res-final">
+                    <span class="res-final-icon">🎬</span>
+                    <h3>All Promises Sealed</h3>
+                    <p>Rolling the cameras now…</p>
+                </div>
+            </div>
+
+            <p class="gate-footer-text">Consistency &gt; Motivation • Discipline Today, Success Tomorrow.</p>
+        </div>
+    </div>
+
     <!-- BACKGROUND MUSIC (plays site-wide from page load) -->
     <audio id="bgMusic" src="hbd.mp3" loop preload="auto"></audio>
     <button id="musicToggleBtn" class="global-music-btn" aria-label="Play background music">
@@ -91,7 +175,7 @@
             <div class="sign">PEACE</div>
         </div>
 
-        <!-- FILM STRIP GALLERY (duplicated once for seamless loop) -->
+        <!-- FILM STRIP GALLERY -->
         <div class="filmstrip-wrap">
             <div class="filmstrip-track" id="filmstripTrack">
                 <div class="polaroid" onclick="openModal('ayappan_video.mp4', 'Fav God — Iyyappa ♡', 'video')" tabindex="0">
@@ -110,17 +194,23 @@
                     <p>Fav Temple ♡</p>
                 </div>
 
-                <!-- UPDATED WITH NEXT VIDEO PARAMETER -->
-<div class="polaroid" onclick="openModal('ilayaraja_video.mp4', 'Fav Music — Ilaiyaraaja ♡', 'video', ['song-22.mp4', 'song-33.mp4'])" tabindex="0">
-    <div class="polaroid-cover">
-        <img src="Ilayaraja.jpg" alt="Fav Music" class="polaroid-box-img">
-        <span class="reveal-hint">▶ Click to play</span>
-    </div>
-    <p>Fav Music ♡</p>
-</div>
+                <div class="polaroid" onclick="openModal('song_2.mp4', 'Fav song — Muthumani ♡', 'video')" tabindex="0">
+                    <div class="polaroid-cover">
+                        <img src="fav_song.jpg" alt="Fav Song" class="polaroid-box-img">
+                        <span class="reveal-hint">▶ Click to play</span>
+                    </div>
+                    <p>Fav Song ♡</p>
+                </div>
 
-                <!-- UPDATED WITH NEXT VIDEO PARAMETER -->
-                <div class="polaroid" onclick="openModal('sethubathi_video.mp4', 'Fav Hero — Vijay Sethupathi ♡', 'video', 'hero-22.mp4')" tabindex="0">
+                <div class="polaroid" onclick="openModal('ilayaraja_video.mp4', 'Fav Music — Ilaiyaraaja ♡', 'video', 'song-33.mp4')" tabindex="0">
+                    <div class="polaroid-cover">
+                        <img src="ilayaraja.jpg" alt="Fav Music" class="polaroid-box-img">
+                        <span class="reveal-hint">▶ Click to play</span>
+                    </div>
+                    <p>Fav Music ♡</p>
+                </div>
+
+                <div class="polaroid" onclick="openModal('sethubathi_video.mp4', 'Fav Hero — Vijay Sethupathi ♡', 'video', 'hero_2.mp4')" tabindex="0">
                     <div class="polaroid-cover">
                         <img src="Vijay Sethupathi.jpg" alt="Fav Hero" class="polaroid-box-img">
                         <span class="reveal-hint">▶ Click to play</span>
@@ -128,8 +218,7 @@
                     <p>Fav Hero ♡</p>
                 </div>
 
-                <!-- UPDATED WITH NEXT VIDEO PARAMETER -->
-                <div class="polaroid" onclick="openModal('nayan_video.mp4', 'Fav Heroine — Nayanthara ♡', 'video', 'heroine-22.mp4')" tabindex="0">
+                <div class="polaroid" onclick="openModal('nayan_video.mp4', 'Fav Heroine — Nayanthara ♡', 'video', 'heroine_2.mp4')" tabindex="0">
                     <div class="polaroid-cover">
                         <img src="nayanthara_img.jpg" alt="Fav Heroine" class="polaroid-box-img">
                         <span class="reveal-hint">▶ Click to play</span>
@@ -156,11 +245,11 @@
                 <p>Somewhere between balance sheets and cinema, there's a filmmaker waiting for his cue.</p>
                 <p class="credit-line">Mysskin • Dharma Durai • Super Deluxe</p>
             </div>
-            <div class="poster-card">
+            <!-- <div class="poster-card">
                 <h3>🎵 The Soundtrack</h3>
                 <p>Some people listen to songs. Some people live inside them, on repeat, on loop, forever.</p>
                 <p class="credit-line">Ilaiyaraaja, always.</p>
-            </div>
+            </div> -->
         </div>
     </section>
 
@@ -184,12 +273,6 @@
                 <audio id="specialAudio" src="audio.mp3"></audio>
                 <button class="play-btn" onclick="playAudio()">▶ Play Her Voice / Ringtone</button>
             </div>
-            
-            <!-- <div class="people-card">
-                <h2>His fav song 🎵</h2>
-                <p class="caption-line">The track on repeat.</p>
-                <button class="play-btn" onclick="openModal('add_song.mp4', 'His Fav Song', 'video')">▶ Listen to song</button>
-            </div> -->
         </div>
     </section>
 
@@ -506,7 +589,6 @@
         </main>
     </section>
 
-    <!-- UPDATED: Added Next Button inside the Modal -->
     <div id="imageModal" class="modal">
         <span class="close-modal" onclick="closeModal()">&times;</span>
         <img class="modal-content" id="modalImg">
