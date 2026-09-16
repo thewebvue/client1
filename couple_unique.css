@@ -4,6 +4,258 @@
    telling you on a quiet Ooty walk (Abhiyum Naanum mood).
    ========================================================= */
 
+/* ---------- RESOLUTION GATE ---------- */
+#resolutionGate {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 50% -10%, rgba(201,154,63,0.14), transparent 55%),
+        radial-gradient(circle at center, var(--ink-soft) 0%, var(--ink) 100%);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: opacity 0.8s ease, visibility 0.8s;
+    overflow-y: auto;
+}
+#resolutionGate.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+.resolution-card {
+    position: relative;
+    background: var(--paper-warm);
+    color: var(--ink);
+    padding: 40px 30px;
+    border-radius: 12px;
+    max-width: 620px;
+    width: 100%;
+    border: 2px solid var(--gold);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 30px rgba(201,154,63,0.2);
+    transform: scale(0.95);
+    animation: gatePopIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    margin: 30px 0;
+}
+@keyframes gatePopIn {
+    to { transform: scale(1); }
+}
+.gate-reel-tag {
+    display: block;
+    text-align: center;
+    font-family: var(--font-script);
+    color: var(--maroon);
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+}
+.gate-title {
+    font-family: var(--font-display);
+    color: var(--maroon-deep);
+    font-size: 2.4rem;
+    text-align: center;
+    margin-bottom: 12px;
+}
+.gate-sub {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 26px;
+    color: var(--ink-soft);
+    border-bottom: 1px dashed var(--gold);
+    padding-bottom: 18px;
+}
+
+/* ---- progress: dots + "Question X of 5" ---- */
+.res-progress-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+.res-progress-dots { display: flex; gap: 8px; }
+.res-progress-dots .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: rgba(21,19,15,0.15);
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+.res-progress-dots .dot.done { background: var(--hill-green); }
+.res-progress-dots .dot.current { background: var(--gold); transform: scale(1.3); }
+.res-step-label {
+    font-family: var(--font-script);
+    color: var(--maroon);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+/* ---- the one-question-at-a-time stage ---- */
+.res-stage {
+    position: relative;
+    min-height: 280px;
+}
+.res-item {
+    display: none;
+    flex-direction: column;
+    gap: 22px;
+    padding: 30px 24px;
+    background: rgba(201,154,63,0.08);
+    border: 1px solid rgba(201,154,63,0.3);
+    border-radius: 12px;
+}
+.res-item.active {
+    display: flex;
+    animation: resSlideIn 0.5s cubic-bezier(0.2,0.8,0.2,1) both;
+}
+@keyframes resSlideIn {
+    from { opacity: 0; transform: translateX(26px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+.res-text { 
+    text-align: center; 
+    line-height: 1.6;
+    padding: 0 10px;
+}
+.res-text strong {
+    font-size: 1.35rem;
+    font-family: var(--font-display);
+    color: var(--maroon-deep);
+    display: block;
+    margin-bottom: 8px;
+}
+.res-text small {
+    font-family: var(--font-script);
+    font-size: 1.25rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+    display: block;
+}
+
+/* ---- the Yes/No dodge zone ---- */
+.res-choice {
+    position: relative;
+    height: 140px;
+    width: 100%;
+}
+.res-yes, .res-no {
+    position: absolute;
+    left: 50%;
+    padding: 14px 26px;
+    border-radius: 30px;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: left 0.28s cubic-bezier(0.34,1.8,0.5,1), top 0.28s cubic-bezier(0.34,1.8,0.5,1),
+                transform 0.2s ease, background 0.25s ease, border-color 0.25s ease, opacity 0.3s ease;
+}
+.res-yes {
+    top: 15px;
+    transform: translateX(-50%);
+    z-index: 3;
+    border: 1px solid var(--gold);
+    background: var(--ink);
+    color: var(--gold-bright);
+    font-weight: 700;
+    font-size: 1.05rem;
+    box-shadow: 0 6px 18px rgba(21,19,15,0.3);
+    animation: resYesPulse 2.2s ease-in-out infinite;
+}
+.res-yes .clap { display: inline-block; animation: resClapWiggle 1.6s ease-in-out infinite; }
+@keyframes resClapWiggle {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-12deg); }
+}
+@keyframes resYesPulse {
+    0%, 100% { box-shadow: 0 6px 18px rgba(21,19,15,0.3), 0 0 0 0 rgba(201,154,63,0.35); }
+    50% { box-shadow: 0 6px 18px rgba(21,19,15,0.3), 0 0 0 10px rgba(201,154,63,0); }
+}
+.res-yes:hover { background: var(--maroon); border-color: var(--maroon); color: var(--paper); transform: translateX(-50%) scale(1.06); }
+.res-yes:active { transform: translateX(-50%) scale(0.95); }
+
+.res-no {
+    top: 75px;
+    transform: translateX(-50%);
+    z-index: 2;
+    border: 1px dashed rgba(124,42,42,0.6);
+    background: rgba(255,255,255,0.5);
+    color: var(--maroon);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+.res-no.tucked {
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) scale(0.8);
+}
+
+.res-funny-bubble {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    margin-top: -12px;
+    background: var(--ink);
+    color: var(--gold-bright);
+    border: 1px solid var(--gold);
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-family: var(--font-script);
+    font-size: 1.25rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 6;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.res-funny-bubble.show {
+    opacity: 1;
+    transform: translate(-50%, -100%) translateY(-6px);
+}
+
+/* ---- final "all sealed" panel ---- */
+.res-final {
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    min-height: 280px;
+}
+.res-final-icon {
+    font-size: 3rem;
+    animation: resFinalSpin 1.2s ease-in-out;
+}
+@keyframes resFinalSpin {
+    from { transform: rotate(-15deg) scale(0.6); opacity: 0; }
+    to { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+.res-final h3 {
+    font-family: var(--font-display);
+    color: var(--hill-green);
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+.res-final p {
+    font-family: var(--font-script);
+    color: var(--maroon);
+    font-size: 1.4rem;
+}
+
+.gate-footer-text {
+    text-align: center;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--muted, #6b6152);
+    margin-top: 26px;
+}
+
+@media (max-width: 768px) {
+    .resolution-card { padding: 30px 18px; }
+    .gate-title { font-size: 1.9rem; }
+    .res-item { padding: 20px 14px; gap: 16px; }
+    .res-text strong { font-size: 1.15rem; }
+    .res-text small { font-size: 1.1rem; }
+    .res-yes, .res-no { font-size: 0.95rem; padding: 12px 22px; }
+    .res-stage { min-height: 260px; }
+}
+
 :root {
     --ink: #15130f;
     --ink-soft: #221e18;
