@@ -697,7 +697,9 @@ Naanum irukkanum.** ❤️🎬
 **Happy Birthday, En CA…
 My Director…
 My Dreamer…
-My Forever.** 🫶🏻`;
+My Forever.** 🫶🏻
+                     `
+;
 
 const memoryImages = [
     { url: "photo_7.jpeg", caption: "Where It All Began 🕰️" },
@@ -1136,17 +1138,8 @@ function cxFormatLetter(text) {
 }
 
 function cxShowLetterStage() {
-    if (cx.letterNameDisplay) cx.letterNameDisplay.textContent = birthdayName;
-    if (cx.letterBodyContent) {
-        cx.letterBodyContent.innerHTML = cxFormatLetter(birthdayMessage);
-        cx.letterBodyContent.style.whiteSpace = 'pre-line';
-        cx.letterBodyContent.style.overflowY = 'auto';
-        cx.letterBodyContent.style.maxHeight = '65vh';
-        if (cx.letterBodyContent.parentElement) {
-            cx.letterBodyContent.parentElement.style.overflowY = 'auto';
-            cx.letterBodyContent.parentElement.style.maxHeight = '80vh';
-        }
-    }
+    cx.letterNameDisplay.textContent = birthdayName;
+    cx.letterBodyContent.innerHTML = cxFormatLetter(birthdayMessage);
     cxSwitchStage(cx.memoryStage, cx.letterStage);
 }
 
