@@ -1297,7 +1297,7 @@ nav {
 .cx-root .gallery-bottom-action { margin-top: 20px; }
 
 /* ---------- STAGE 4: LETTER ---------- */
-.cx-root .envelope-wrapper { position: relative; width: 100%; max-width: 600px; min-height: 460px; margin: 12px auto 20px; perspective: 1000px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.cx-root .envelope-wrapper { position: relative; width: 100%; max-width: 600px; min-height: 460px; margin: 12px auto 140px; perspective: 1000px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .cx-root .envelope-3d { position: relative; width: 280px; height: 174px; background: #7c2a2a; border-radius: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 30px rgba(124,42,42,0.3); cursor: pointer; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.2,0.9,0.3,1), opacity 0.5s ease; }
 .cx-root .envelope-3d:hover { transform: translateY(-4px) scale(1.02); }
 .cx-root .envelope-3d.envelope-open { transform: translateY(56px) scale(0.85); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
@@ -1322,13 +1322,13 @@ nav {
 }
 .cx-root .envelope-open .letter-sheet {
     opacity: 1;
-    transform: translateX(-50%) translateY(-70px) translateZ(50px) scale(1.02);
-    width: min(90vw, 480px);
+    transform: translateX(-50%) translateY(-90px) translateZ(50px) scale(1.02);
+    width: min(94vw, 620px);
     height: auto;
-    max-height: 78vh;
+    max-height: 88vh;
     overflow-y: auto;
     z-index: 25;
-    padding: 26px 24px;
+    padding: 30px 28px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.75), 0 0 35px rgba(124,42,42,0.35);
     pointer-events: auto;
 }
@@ -1389,7 +1389,7 @@ nav {
     .cx-root .envelope-front-right { border-width: 84px 130px 84px 0; }
     .cx-root .envelope-front-bottom { border-width: 0 130px 92px 130px; }
     .cx-root .envelope-flap { border-width: 96px 130px 0 130px; }
-    .cx-root .envelope-open .letter-sheet { width: min(92vw, 420px); transform: translateX(-50%) translateY(-60px) translateZ(30px) scale(1.01); }
+    .cx-root .envelope-open .letter-sheet { width: min(96vw, 460px); max-height: 85vh; transform: translateX(-50%) translateY(-80px) translateZ(30px) scale(1.01); }
     .cx-root .glass-panel { padding: 26px 16px; }
     .cx-root .finale-actions { flex-direction: column; }
     .cx-root .action-btn { width: 100%; padding: 12px 22px; font-size: 0.95rem; }
@@ -1398,7 +1398,7 @@ nav {
     .cx-root .main-title { font-size: 2.4rem; }
     .cx-root .recipient-title { font-size: 3.1rem; }
     .cx-root .polaroid-gallery { grid-template-columns: repeat(3, 1fr); }
-    .cx-root .envelope-open .letter-sheet { width: min(70vw, 600px); transform: translateX(-50%) translateY(-80px) translateZ(40px) scale(1.03); }
+    .cx-root .envelope-open .letter-sheet { width: min(75vw, 720px); max-height: 88vh; transform: translateX(-50%) translateY(-100px) translateZ(40px) scale(1.03); }
 }
 @media (prefers-reduced-motion: reduce) {
     .cx-root *, .cx-root *::before, .cx-root *::after { animation-duration: 0.001ms !important; }
